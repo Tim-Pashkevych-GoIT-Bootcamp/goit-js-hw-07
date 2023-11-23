@@ -33,9 +33,20 @@ gallery.addEventListener('click', event => {
       .create(
         `<div class="modal"><img src="${targetElement.parentNode.href}"></div>`,
         {
-          className: 'gallery-modal-window',
           onShow: instance => {
+            // Close Modal window on click
             instance.element().onclick = instance.close;
+
+            // Close Modal window on press Esc key
+            document.addEventListener('keydown', event =>
+              escapeKeyPress(event, instance),
+            );
+          },
+          onClose: instance => {
+            // Remove Event Listener
+            document.removeEventListener('keydown', event =>
+              escapeKeyPress(event, instance),
+            );
           },
         },
       )
@@ -43,21 +54,8 @@ gallery.addEventListener('click', event => {
   }
 });
 
-/**
-  |============================
-  | Close modal window on pressing Escape button
-  |============================
-*/
-document.addEventListener('keydown', event => {
-  if (event.code === 'Escape' && basicLightbox.visible()) {
-    const modalWindow = document.querySelector('.gallery-modal-window');
-    basicLightbox
-      .create(modalWindow, {
-        onClose: instance => {
-          // Чомусь не прибирається бекдроп, тому видаляю примусово
-          modalWindow.remove();
-        },
-      })
-      .close();
+function escapeKeyPress(event, instance) {
+  if (event.code === 'Escape' && instance.visible()) {
+    instance.close();
   }
-});
+}
