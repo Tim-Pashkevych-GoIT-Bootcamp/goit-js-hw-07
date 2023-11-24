@@ -34,19 +34,20 @@ gallery.addEventListener('click', event => {
         `<div class="modal"><img src="${targetElement.parentNode.href}"></div>`,
         {
           onShow: instance => {
-            // Close Modal window on click
+            // Якщо я це видаляю, то модальне вікно не закривається при кліку на картинку =(
             instance.element().onclick = instance.close;
 
-            // Close Modal window on press Esc key
-            document.addEventListener('keydown', event =>
-              escapeKeyPress(event, instance),
-            );
+            // можна не стрілочну використовувати а звичайну функцію?
+            // я просто хочу щоб callback функція була "чистою" тобто передавати їй переміну instance
+            document.addEventListener('keydown', function (event) {
+              escapeKeyPress(event, instance);
+            });
           },
           onClose: instance => {
             // Remove Event Listener
-            document.removeEventListener('keydown', event =>
-              escapeKeyPress(event, instance),
-            );
+            document.removeEventListener('keydown', function (event) {
+              escapeKeyPress(event, instance);
+            });
           },
         },
       )
