@@ -18,45 +18,43 @@ gallery.insertAdjacentHTML(
 
 /**
   |============================
+  | BasicLightbox initialization
+  |============================
+*/
+const instance = basicLightbox.create(`<div class="modal"><img src=""></div>`, {
+  onShow: instance => {
+    window.addEventListener('keydown', escapeKeyPress);
+  },
+  onClose: instance => {
+    window.removeEventListener('keydown', escapeKeyPress);
+  },
+});
+// Close modal window when we click on image
+instance.element().onclick = instance.close;
+
+// Close modal window when we press Esc key: callback function
+function escapeKeyPress(event) {
+  if (event.code === 'Escape' && instance.visible()) {
+    instance.close();
+    return;
+  }
+}
+
+/**
+  |============================
   | Click event delegation
   |============================
 */
-gallery.addEventListener('click', event => {
-  const { target: targetElement } = event;
+gallery.addEventListener('click', onImageClick);
 
+// Show an Image in modal window when we click on the image: callback function
+function onImageClick(event) {
   // Prevent default activity
   event.preventDefault();
 
-  if (targetElement.nodeName === 'IMG') {
-    // Create a new instance of a modal window with an image
-    basicLightbox
-      .create(
-        `<div class="modal"><img src="${targetElement.parentNode.href}"></div>`,
-        {
-          onShow: instance => {
-            // Якщо я це видаляю, то модальне вікно не закривається при кліку на картинку =(
-            instance.element().onclick = instance.close;
-
-            // можна не стрілочну використовувати а звичайну функцію?
-            // я просто хочу щоб callback функція була "чистою" тобто передавати їй переміну instance
-            document.addEventListener('keydown', function (event) {
-              escapeKeyPress(event, instance);
-            });
-          },
-          onClose: instance => {
-            // Remove Event Listener
-            document.removeEventListener('keydown', function (event) {
-              escapeKeyPress(event, instance);
-            });
-          },
-        },
-      )
-      .show();
-  }
-});
-
-function escapeKeyPress(event, instance) {
-  if (event.code === 'Escape' && instance.visible()) {
-    instance.close();
+  if (event.target.nodeName === 'IMG' && !instance.visible()) {
+    instance.element().querySelector('img').src = event.target.dataset.source;
+    instance.show();
+    return;
   }
 }
